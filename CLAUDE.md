@@ -36,6 +36,32 @@
 ### 実装しないもの（意図的に除外）
 - ファイル変更の自動検知・差分更新
 
+---
+
+## 現在の進捗
+
+### 完了済み
+- プロジェクト骨格（ディレクトリ構成・Dockerfile・docker-compose.yml）
+- `backend/app/main.py`：FastAPI + CORS設定
+- `backend/app/config.py`：`.env` 読み込み（pydantic-settings）
+- `backend/app/api/routes.py`：3エンドポイント定義済み（未実装）
+  - `POST /index`：URL群をインデックス化
+  - `POST /query`：質問 → 回答
+  - `DELETE /index`：インデックス削除
+- `backend/app/services/scraper.py`：**実装済み**
+  - httpxで非同期HTTP取得、BeautifulSoupでテキスト抽出
+  - script/style/nav/header/footer/aside タグを除去してクリーンなテキストを返す
+  - 単体実行可能：`docker-compose run --rm backend python -m app.services.scraper`
+
+### 次にやること（順番通り）
+1. `backend/app/services/indexer.py`：テキスト → Chroma保存
+   - Recursive Splitでチャンク分割（サイズ600〜800、オーバーラップ150）
+   - 埋め込みモデル: `intfloat/multilingual-e5-small`
+   - URLをメタデータとして保存（後でsourcesとして返すため）
+2. `backend/app/services/rag.py`：検索 → LLM呼び出し → 回答生成
+3. `backend/app/api/routes.py`：各エンドポイントの実装を繋ぎ込む
+4. フロントエンド（v0で生成 → React/Vite）
+
 
 ## 補足メモ
 - READMEはバージョン分け（v1.0: Web対応、v2.0: PDF対応）で開発の積み重ねを可視化する
