@@ -29,7 +29,7 @@ async def answer(question: str, history: list[dict]) -> tuple[str, list[str]]:
 
     docs: list[str] = results["documents"][0]
     metas: list[dict] = results["metadatas"][0]
-    sources = list(dict.fromkeys(m["url"] for m in metas))
+    sources = list({m["url"] for m in metas})
 
     context = "\n\n---\n\n".join(docs)
 
