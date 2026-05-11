@@ -1,5 +1,9 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
+
+from app.services.indexer import indexer
+from app.services.rag import answer
+from app.services.scraper import scrape
 
 router = APIRouter()
 
@@ -24,14 +28,23 @@ class QueryResponse(BaseModel):
 
 @router.post("/index", response_model=IndexResponse)
 async def index_urls(body: IndexRequest):
-    raise NotImplementedError
+    indexed = []
+    for url in body.urls:
+        try:
+            text = await scrape(url)
+            indexer.index(url, text)
+            indexed.append(url)
+        except Exception as e:
+            raise HTTPException(status_code=422, detail=f"{url}: {e}")
+    return IndexResponse(indexed=indexed)
 
 
 @router.post("/query", response_model=QueryResponse)
 async def query(body: QueryRequest):
-    raise NotImplementedError
+    ans, sources = await answer(body.question, body.history)
+    return QueryResponse(answer=ans, sources=sources)
 
 
-@router.delete("/index")
+@router.delete("/index", status_code=204)
 async def clear_index():
-    raise NotImplementedError
+    indexer.clear()
