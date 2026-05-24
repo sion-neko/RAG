@@ -52,6 +52,14 @@ export default function App() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ question: userMsg.content, history }),
       });
+      if (!res.ok) {
+        const err = await res.json();
+        setMessages((prev) => [
+          ...prev,
+          { role: "assistant", content: `エラー: ${err.detail ?? res.statusText}`, sources: [] },
+        ]);
+        return;
+      }
       const data = await res.json();
       setMessages((prev) => [
         ...prev,

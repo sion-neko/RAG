@@ -5,8 +5,8 @@ export default defineConfig({
   plugins: [react()],
   server: {
     proxy: {
-      "/index": "http://localhost:8000",
-      "/query": "http://localhost:8000",
+      "/index": "http://backend:8000",
+      "/query": "http://backend:8000",
     },
   },
 });
