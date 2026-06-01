@@ -21,9 +21,20 @@ class IndexResponse(BaseModel):
     indexed: list[str]
 
 
+class SourcesResponse(BaseModel):
+    sources: list[str]
+
+
 class QueryResponse(BaseModel):
     answer: str
     sources: list[str]
+
+
+@router.get("/index", response_model=SourcesResponse)
+async def get_sources():
+    result = indexer.collection.get(include=["metadatas"])
+    sources = sorted({m["url"] for m in result["metadatas"]})
+    return SourcesResponse(sources=sources)
 
 
 @router.post("/index", response_model=IndexResponse)

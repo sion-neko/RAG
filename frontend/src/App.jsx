@@ -1,10 +1,17 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 const API = "";
 
 export default function App() {
   const [urlInput, setUrlInput] = useState("");
   const [indexedUrls, setIndexedUrls] = useState([]);
+
+  useEffect(() => {
+    fetch(`${API}/index`)
+      .then((r) => r.json())
+      .then((data) => setIndexedUrls(data.sources ?? []))
+      .catch(() => {});
+  }, []);
   const [messages, setMessages] = useState([]);
   const [question, setQuestion] = useState("");
   const [loading, setLoading] = useState(false);
@@ -27,6 +34,7 @@ export default function App() {
       const data = await res.json();
       setIndexedUrls((prev) => [...new Set([...prev, ...data.indexed])]);
       setUrlInput("");
+      fetch(`${API}/index`).then((r) => r.json()).then((d) => setIndexedUrls(d.sources ?? []));
     } finally {
       setLoading(false);
     }
@@ -36,6 +44,7 @@ export default function App() {
     if (!confirm("インデックスを全削除しますか？")) return;
     await fetch(`${API}/index`, { method: "DELETE" });
     setIndexedUrls([]);
+    fetch(`${API}/index`).then((r) => r.json()).then((d) => setIndexedUrls(d.sources ?? []));
     setMessages([]);
   }
 
