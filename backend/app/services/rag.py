@@ -12,7 +12,7 @@ _client = AsyncOpenAI(
 
 _SYSTEM = (
     "You are a helpful assistant. Answer the user's question using only the provided context. "
-    "If the context is insufficient, say so honestly. "
+    "If the context does not contain enough information to answer, clearly say you don't know — do not guess or make up an answer. "
     "Always reply in the same language as the user's question."
 )
 
